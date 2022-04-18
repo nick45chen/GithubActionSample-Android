@@ -13,6 +13,23 @@ def keystoreProperties = new Properties()
 // Load your keystore.properties file into the keystoreProperties object.
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
+// debug log
+// todo: removed in production
+if (keystorePropertiesFile.canRead()) {
+    if (keystoreProperties != null) {
+        println '🔑 signing'
+        println("keyAlias: ${keystoreProperties['keyAlias']}")
+        println("keyPassword: ${keystoreProperties['keyPassword']}")
+        println("storeFile: ${keystoreProperties['storeFile']}")
+        println("storePassword: ${keystoreProperties['storePassword']}")
+    } else {
+        println '🪦 some entries in \'signing.properties\' not found!'
+    }
+} else {
+    println('🔴 keystore file not found!')
+}
+
+
 android {
     compileSdk 31
 
