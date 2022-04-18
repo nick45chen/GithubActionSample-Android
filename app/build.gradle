@@ -3,6 +3,33 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+// Create a variable called keystorePropertiesFile, and initialize it to your
+// keystore.properties file, in the rootProject folder.
+def keystorePropertiesFile = rootProject.file("keystore/keystore.properties")
+
+// Initialize a new Properties() object called keystoreProperties.
+def keystoreProperties = new Properties()
+
+// Load your keystore.properties file into the keystoreProperties object.
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+// debug log
+// todo: removed in production
+if (keystorePropertiesFile.canRead()) {
+    if (keystoreProperties != null) {
+        println '🔑 signing'
+        println("keyAlias: ${keystoreProperties['keyAlias']}")
+        println("keyPassword: ${keystoreProperties['keyPassword']}")
+        println("storeFile: ${keystoreProperties['storeFile']}")
+        println("storePassword: ${keystoreProperties['storePassword']}")
+    } else {
+        println '🪦 some entries in \'signing.properties\' not found!'
+    }
+} else {
+    println('🔴 keystore file not found!')
+}
+
+
 android {
     compileSdk 31
 
@@ -28,6 +55,15 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
     }
 }
 

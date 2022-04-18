@@ -24,9 +24,10 @@ misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
 
-# Keystore files
-*.jks
-*.keystore
+# Keystore files 
+# 示範用先上傳，正式專案可以將 keystore 轉為 base64，並設置在 Github secretKey.
+# *.jks 
+# *.keystore
 
 # Google Services (e.g. APIs or Firebase)
 google-services.json
