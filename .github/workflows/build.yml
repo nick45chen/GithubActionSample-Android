@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - master
-      - feature/upgrade_github_action_config
+      - feature/upgrade_github_action_config #todo: test
   pull_request:
     branches:
       - master
