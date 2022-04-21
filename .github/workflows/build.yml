@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - feature/upgrade_github_action_config
   pull_request:
     branches:
       - master
