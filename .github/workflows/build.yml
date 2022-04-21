@@ -12,7 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # checkout our repository under $GITHUB_WORKSPACE so the workflow can access it.
-      - uses: actions/checkout@v1
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       # define the java version to 11.
       - name: Setup JDK 11
         uses: actions/setup-java@v2
