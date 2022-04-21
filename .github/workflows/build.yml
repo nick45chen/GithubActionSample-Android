@@ -1,9 +1,12 @@
 name: Build
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+      - issie/fixed_github_action
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
   build:
