@@ -50,7 +50,7 @@ jobs:
         run: ./gradlew assembleDebug
 
       - name: Sign app APK
-        uses: Tlaster/android-sign@v1
+        uses: r0adkll/sign-android-release@v1
         # ID used to access action output
         id: sign_app
         with:
@@ -59,7 +59,6 @@ jobs:
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
-          output: build/release/signed
 
         # Example use of `signedReleaseFile` output -- not needed
       - name: 🤖 Upload Bundle Asset
