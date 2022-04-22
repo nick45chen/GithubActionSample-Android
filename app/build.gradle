@@ -96,3 +96,21 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
+
+tasks.whenTaskAdded { task ->
+    if (task.name.startsWith("bundle")) {
+        def renameTaskName = "rename${task.name.capitalize()}Aab"
+        def flavor = task.name.substring("bundle".length()).uncapitalize()
+        tasks.create(renameTaskName, Copy) {
+            def path = "${buildDir}/outputs/bundle/${flavor}/"
+            from(path)
+            //include "app.aab"
+            include "app-${flavor}.aab"
+            destinationDir file("${buildDir}/outputs/renamedBundle/")
+            //rename "app.aab", "${flavor}.aab"
+            rename "app-${flavor}.aab", "${flavor}.aab"
+        }
+
+        task.finalizedBy(renameTaskName)
+    }
+}
