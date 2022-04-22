@@ -65,7 +65,7 @@ android {
                         // on below line we are replacing -release with our formatted date.
                         newName = newName.replace("-release", "-release-" + formattedDate)
                         // removed github action package name
-                        newName = newName.replace("-unsigned-signed", "")
+                        newName = newName.replace("-unsigned-signed", "-signed")
                         // at last we are setting our apk name to it.
                         output.outputFileName  = newName
                 }
