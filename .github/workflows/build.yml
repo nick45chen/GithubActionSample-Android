@@ -30,24 +30,24 @@ jobs:
         uses: android-actions/setup-android@v2
 
       # This action allows caching dependencies and build outputs to improve workflow execution time.
-#      - name: Cache multiple paths
-#        uses: actions/cache@v3
-#        with:
-#          path: |
-#            ~/cache
-#            !~/cache/exclude
-#          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-#      - name: Setup ruby
-#        uses: ruby/setup-ruby@v1
-#        with:
-#          ruby-version: 2.7
-#      - name: Cache Ruby dependencies
-#        uses: actions/cache@v3
-#        with:
-#          path: 'vendor/bundle'
-#          key: ${{ runner.os }}-gems-${{ secrets.GEMS_CACHE_VERSION }}-${{ hashFiles('**/Gemfile.lock') }}
-#          restore-keys: |
-#            ${{ runner.os }}-gems-
+      #      - name: Cache multiple paths
+      #        uses: actions/cache@v3
+      #        with:
+      #          path: |
+      #            ~/cache
+      #            !~/cache/exclude
+      #          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+      #      - name: Setup ruby
+      #        uses: ruby/setup-ruby@v1
+      #        with:
+      #          ruby-version: 2.7
+      #      - name: Cache Ruby dependencies
+      #        uses: actions/cache@v3
+      #        with:
+      #          path: 'vendor/bundle'
+      #          key: ${{ runner.os }}-gems-${{ secrets.GEMS_CACHE_VERSION }}-${{ hashFiles('**/Gemfile.lock') }}
+      #          restore-keys: |
+      #            ${{ runner.os }}-gems-
 
       - name: Cache Gradle packages
         uses: actions/cache@v3
@@ -59,21 +59,43 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-#      - name: Install dependencies to support ruby project
-#        run: |
-#          bundle config --global set deploy_platform_default x86_64-linux
-#          bundle install
+      #      - name: Install dependencies to support ruby project
+      #        run: |
+      #          bundle config --global set deploy_platform_default x86_64-linux
+      #          bundle install
 
       # run all unit tests
       - name: Run Tests
         run: ./gradlew test
 
-#      - name: Build Project
-#        run: ./gradlew assemble
+      #      - name: Build Project
+      #        run: ./gradlew assemble
 
       # build the project
-#      - name: Build Debug APK
-#        run: ./gradlew assembleDebug
+      #      - name: Build Debug APK
+      #        run: ./gradlew assembleDebug
+      - name: Prepare Release
+        id: prepare_release
+        #         if: contains(github.ref, 'tags/')
+        run: |
+          APK_PATH=`find . -name '*.apk' | grep release`
+          echo ::set-output name=apk_path::$APK_PATH
+          APK_NAME=`basename $APK_PATH`
+          echo ::set-output name=apk_name::$APK_NAME
+          BUNDLE_PATH=`find . -name '*.aab' | grep release | grep -v intermediates`
+          echo ::set-output name=bundle_path::$BUNDLE_PATH
+          BUNDLE_NAME=`basename $BUNDLE_PATH`
+          echo ::set-output name=bundle_name::$BUNDLE_NAME
+      #        選用
+      #        TAG_NAME=`echo $GITHUB_REF | cut -d / -f3`
+      #        echo ::set-output name=tag_name::$TAG_NAME
+      #        PACKAGE_NAME=`./tools/aapt2 dump packagename $APK_PATH`
+      #        echo ::set-output name=package_name::$PACKAGE_NAME
+      - name: Print build PATH
+        run: |
+          echo ${{steps.prepare_release.outputs.bundle_path}}
+          echo ${{steps.prepare_release.outputs.apk_name}}
+          echo ${{steps.prepare_release.outputs.bundle_path}}/${{steps.prepare_release.outputs.apk_name}}
 
       - name: Sign app APK
         uses: r0adkll/sign-android-release@v1
@@ -86,15 +108,30 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
 
-        # Example use of `signedReleaseFile` output -- not needed
-      - name: 🤖 Upload Bundle Asset
+      #Uploads
+      - name: Upload Apk Artifact
+        if: steps.prepare_release.outputs.apk_path
         uses: actions/upload-artifact@v2
         with:
-          name: Signed app bundle
-          path: ${{steps.sign_app.outputs.signedReleaseFile}}
+          name: app-release.apk
+          path: android/app/build/outputs/apk/release/
+      #Uploads
+      - name: Upload Bundle Artifact
+        if: steps.prepare_release.outputs.bundle_path
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release.aab
+          path: android/app/build/outputs/bundle/release/
 
-      - name: 🤖 Upload apk
-        uses: actions/upload-artifact@v2
-        with:
-          name: debug apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+        # Example use of `signedReleaseFile` output -- not needed
+#      - name: 🤖 Upload Bundle Asset
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: Signed app bundle
+#          path: ${{steps.sign_app.outputs.signedReleaseFile}}
+
+#      - name: 🤖 Upload apk
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: debug apk
+#          path: app/build/outputs/apk/debug/app-debug.apk
