@@ -30,13 +30,39 @@ jobs:
         uses: android-actions/setup-android@v2
 
       # This action allows caching dependencies and build outputs to improve workflow execution time.
-      - name: Cache multiple paths
+#      - name: Cache multiple paths
+#        uses: actions/cache@v3
+#        with:
+#          path: |
+#            ~/cache
+#            !~/cache/exclude
+#          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+      - name: Setup ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+      - name: Cache Ruby dependencies
+        uses: actions/cache@v3
+        with:
+          path: 'vendor/bundle'
+          key: ${{ runner.os }}-gems-${{ secrets.GEMS_CACHE_VERSION }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+
+      - name: Cache Gradle packages
         uses: actions/cache@v3
         with:
           path: |
-            ~/cache
-            !~/cache/exclude
-          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Install dependencies to support ruby project
+        run: |
+          bundle config --global set deploy_platform_default x86_64-linux
+          bundle install
 
       # run all unit tests
       - name: Run Tests
