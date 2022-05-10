@@ -12,13 +12,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # checkout our repository under $GITHUB_WORKSPACE so the workflow can access it.
+      # Checkout The GitHub Repository
       - name: Checkout the repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      # define the java version to 11.
+      # Setup JDK 11
       - name: Setup JDK 11
         uses: actions/setup-java@v3
         with:
@@ -29,26 +29,13 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
 
-      # This action allows caching dependencies and build outputs to improve workflow execution time.
-      #      - name: Cache multiple paths
-      #        uses: actions/cache@v3
-      #        with:
-      #          path: |
-      #            ~/cache
-      #            !~/cache/exclude
-      #          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
-      #      - name: Setup ruby
-      #        uses: ruby/setup-ruby@v1
-      #        with:
-      #          ruby-version: 2.7
-      #      - name: Cache Ruby dependencies
-      #        uses: actions/cache@v3
-      #        with:
-      #          path: 'vendor/bundle'
-      #          key: ${{ runner.os }}-gems-${{ secrets.GEMS_CACHE_VERSION }}-${{ hashFiles('**/Gemfile.lock') }}
-      #          restore-keys: |
-      #            ${{ runner.os }}-gems-
+      # [Optional] Setup Ruby (to run Fastlane project.)
+#      - name: Setup ruby
+#        uses: ruby/setup-ruby@v1
+#        with:
+#          ruby-version: 2.7
 
+      # Caching Environment Dependencies
       - name: Cache Gradle packages
         uses: actions/cache@v3
         with:
@@ -58,11 +45,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-
-      #      - name: Install dependencies to support ruby project
-      #        run: |
-      #          bundle config --global set deploy_platform_default x86_64-linux
-      #          bundle install
 
       # run all unit tests
       - name: Run Tests
